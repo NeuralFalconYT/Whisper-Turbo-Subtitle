@@ -1,91 +1,5 @@
 #@title Utils
-language_dict = {
-    "Akan": {"lang_code": "aka", "meta_code": "aka_Latn"},
-    "Albanian": {"lang_code": "sq", "meta_code": "als_Latn"},
-    "Amharic": {"lang_code": "am", "meta_code": "amh_Ethi"},
-    "Arabic": {"lang_code": "ar", "meta_code": "arb_Arab"},
-    "Armenian": {"lang_code": "hy", "meta_code": "hye_Armn"},
-    "Assamese": {"lang_code": "as", "meta_code": "asm_Beng"},
-    "Azerbaijani": {"lang_code": "az", "meta_code": "azj_Latn"},
-    "Basque": {"lang_code": "eu", "meta_code": "eus_Latn"},
-    "Bashkir": {"lang_code": "ba", "meta_code": "bak_Cyrl"},
-    "Bengali": {"lang_code": "bn", "meta_code": "ben_Beng"},
-    "Bosnian": {"lang_code": "bs", "meta_code": "bos_Latn"},
-    "Bulgarian": {"lang_code": "bg", "meta_code": "bul_Cyrl"},
-    "Burmese": {"lang_code": "my", "meta_code": "mya_Mymr"},
-    "Catalan": {"lang_code": "ca", "meta_code": "cat_Latn"},
-    "Chinese": {"lang_code": "zh", "meta_code": "zh_Hans"},
-    "Croatian": {"lang_code": "hr", "meta_code": "hrv_Latn"},
-    "Czech": {"lang_code": "cs", "meta_code": "ces_Latn"},
-    "Danish": {"lang_code": "da", "meta_code": "dan_Latn"},
-    "Dutch": {"lang_code": "nl", "meta_code": "nld_Latn"},
-    "English": {"lang_code": "en", "meta_code": "eng_Latn"},
-    "Estonian": {"lang_code": "et", "meta_code": "est_Latn"},
-    "Faroese": {"lang_code": "fo", "meta_code": "fao_Latn"},
-    "Finnish": {"lang_code": "fi", "meta_code": "fin_Latn"},
-    "French": {"lang_code": "fr", "meta_code": "fra_Latn"},
-    "Galician": {"lang_code": "gl", "meta_code": "glg_Latn"},
-    "Georgian": {"lang_code": "ka", "meta_code": "kat_Geor"},
-    "German": {"lang_code": "de", "meta_code": "deu_Latn"},
-    "Greek": {"lang_code": "el", "meta_code": "ell_Grek"},
-    "Gujarati": {"lang_code": "gu", "meta_code": "guj_Gujr"},
-    "Haitian Creole": {"lang_code": "ht", "meta_code": "hat_Latn"},
-    "Hausa": {"lang_code": "ha", "meta_code": "hau_Latn"},
-    "Hebrew": {"lang_code": "he", "meta_code": "heb_Hebr"},
-    "Hindi": {"lang_code": "hi", "meta_code": "hin_Deva"},
-    "Hungarian": {"lang_code": "hu", "meta_code": "hun_Latn"},
-    "Icelandic": {"lang_code": "is", "meta_code": "isl_Latn"},
-    "Indonesian": {"lang_code": "id", "meta_code": "ind_Latn"},
-    "Italian": {"lang_code": "it", "meta_code": "ita_Latn"},
-    "Japanese": {"lang_code": "ja", "meta_code": "jpn_Jpan"},
-    "Kannada": {"lang_code": "kn", "meta_code": "kan_Knda"},
-    "Kazakh": {"lang_code": "kk", "meta_code": "kaz_Cyrl"},
-    "Korean": {"lang_code": "ko", "meta_code": "kor_Hang"},
-    "Kurdish": {"lang_code": "ckb", "meta_code": "ckb_Arab"},
-    "Kyrgyz": {"lang_code": "ky", "meta_code": "kir_Cyrl"},
-    "Lao": {"lang_code": "lo", "meta_code": "lao_Laoo"},
-    "Lithuanian": {"lang_code": "lt", "meta_code": "lit_Latn"},
-    "Luxembourgish": {"lang_code": "lb", "meta_code": "ltz_Latn"},
-    "Macedonian": {"lang_code": "mk", "meta_code": "mkd_Cyrl"},
-    "Malay": {"lang_code": "ms", "meta_code": "ms_Latn"},
-    "Malayalam": {"lang_code": "ml", "meta_code": "mal_Mlym"},
-    "Maltese": {"lang_code": "mt", "meta_code": "mlt_Latn"},
-    "Maori": {"lang_code": "mi", "meta_code": "mri_Latn"},
-    "Marathi": {"lang_code": "mr", "meta_code": "mar_Deva"},
-    "Mongolian": {"lang_code": "mn", "meta_code": "khk_Cyrl"},
-    "Nepali": {"lang_code": "ne", "meta_code": "npi_Deva"},
-    "Norwegian": {"lang_code": "no", "meta_code": "nob_Latn"},
-    "Norwegian Nynorsk": {"lang_code": "nn", "meta_code": "nno_Latn"},
-    "Pashto": {"lang_code": "ps", "meta_code": "pbt_Arab"},
-    "Persian": {"lang_code": "fa", "meta_code": "pes_Arab"},
-    "Polish": {"lang_code": "pl", "meta_code": "pol_Latn"},
-    "Portuguese": {"lang_code": "pt", "meta_code": "por_Latn"},
-    "Punjabi": {"lang_code": "pa", "meta_code": "pan_Guru"},
-    "Romanian": {"lang_code": "ro", "meta_code": "ron_Latn"},
-    "Russian": {"lang_code": "ru", "meta_code": "rus_Cyrl"},
-    "Serbian": {"lang_code": "sr", "meta_code": "srp_Cyrl"},
-    "Sinhala": {"lang_code": "si", "meta_code": "sin_Sinh"},
-    "Slovak": {"lang_code": "sk", "meta_code": "slk_Latn"},
-    "Slovenian": {"lang_code": "sl", "meta_code": "slv_Latn"},
-    "Somali": {"lang_code": "so", "meta_code": "som_Latn"},
-    "Spanish": {"lang_code": "es", "meta_code": "spa_Latn"},
-    "Sundanese": {"lang_code": "su", "meta_code": "sun_Latn"},
-    "Swahili": {"lang_code": "sw", "meta_code": "swa_Latn"},
-    "Swedish": {"lang_code": "sv", "meta_code": "swe_Latn"},
-    "Tamil": {"lang_code": "ta", "meta_code": "tam_Taml"},
-    "Telugu": {"lang_code": "te", "meta_code": "tel_Telu"},
-    "Thai": {"lang_code": "th", "meta_code": "tha_Latn"},
-    "Turkish": {"lang_code": "tr", "meta_code": "tur_Latn"},
-    "Ukrainian": {"lang_code": "uk", "meta_code": "ukr_Cyrl"},
-    "Urdu": {"lang_code": "ur", "meta_code": "urd_Arab"},
-    "Uzbek": {"lang_code": "uz", "meta_code": "uzb_Latn"},
-    "Vietnamese": {"lang_code": "vi", "meta_code": "vie_Latn"},
-    "Welsh": {"lang_code": "cy", "meta_code": "cym_Latn"},
-    "Yiddish": {"lang_code": "yi", "meta_code": "yi_Hebr"},
-    "Yoruba": {"lang_code": "yo", "meta_code": "yo_Latn"},
-    "Zulu": {"lang_code": "zu", "meta_code": "zul_Latn"},
-}
-available_language=['English','Hindi','Bengali','Akan', 'Albanian', 'Amharic', 'Arabic', 'Armenian', 'Assamese', 'Azerbaijani', 'Basque', 'Bashkir', 'Bengali', 'Bosnian', 'Bulgarian', 'Burmese', 'Catalan', 'Chinese', 'Croatian', 'Czech', 'Danish', 'Dutch', 'English', 'Estonian', 'Faroese', 'Finnish', 'French', 'Galician', 'Georgian', 'German', 'Greek', 'Gujarati', 'Haitian Creole', 'Hausa', 'Hebrew', 'Hindi', 'Hungarian', 'Icelandic', 'Indonesian', 'Italian', 'Japanese', 'Kannada', 'Kazakh', 'Korean', 'Kurdish', 'Kyrgyz', 'Lao', 'Lithuanian', 'Luxembourgish', 'Macedonian', 'Malay', 'Malayalam', 'Maltese', 'Maori', 'Marathi', 'Mongolian', 'Nepali', 'Norwegian', 'Norwegian Nynorsk', 'Pashto', 'Persian', 'Polish', 'Portuguese', 'Punjabi', 'Romanian', 'Russian', 'Serbian', 'Sinhala', 'Slovak', 'Slovenian', 'Somali', 'Spanish', 'Sundanese', 'Swahili', 'Swedish', 'Tamil', 'Telugu', 'Thai', 'Turkish', 'Ukrainian', 'Urdu', 'Uzbek', 'Vietnamese', 'Welsh', 'Yiddish', 'Yoruba', 'Zulu']
+from utils import language_dict
 import math
 import torch
 import gc
@@ -99,6 +13,7 @@ import re
 import uuid
 from pydub import AudioSegment
 import torch
+
 
 
 def get_language_name(lang_code):
@@ -316,13 +231,6 @@ def generate_srt_from_sentences(sentence_timestamp, srt_path="default_subtitle.s
 
 def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
   global language_dict,base_path
-  #setup srt file names
-  base_name = os.path.basename(uploaded_file).rsplit('.', 1)[0][:30]
-  save_name = f"{base_path}/generated_subtitle/{base_name}_{Source_Language}.srt"
-  original_srt_name=clean_file_name(save_name)
-  original_txt_name=original_srt_name.replace(".srt",".txt")
-  word_level_srt_name=original_srt_name.replace(".srt","_word_level.srt")
-  default_srt_name=original_srt_name.replace(".srt","_default.srt")
   #Load model
   if torch.cuda.is_available():
       # If CUDA is available, use GPU with float16 precision
@@ -346,14 +254,21 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
     src_lang=Source_Language
   if os.path.exists(audio_path):
     os.remove(audio_path)
-
-
   sentence_timestamp,words_timestamp,text=format_segments(segments)
   del faster_whisper_model
   gc.collect()
   torch.cuda.empty_cache()
 
   word_segments=combine_word_segments(words_timestamp, max_words_per_subtitle=max_words_per_subtitle, min_silence_between_words=0.5)
+
+  #setup srt file names
+  base_name = os.path.basename(uploaded_file).rsplit('.', 1)[0][:30]
+  save_name = f"{base_path}/generated_subtitle/{base_name}_{src_lang}.srt"
+  original_srt_name=clean_file_name(save_name)
+  original_txt_name=original_srt_name.replace(".srt",".txt")
+  word_level_srt_name=original_srt_name.replace(".srt","_word_level.srt")
+  default_srt_name=original_srt_name.replace(".srt","_default.srt")
+    
   generate_srt_from_sentences(sentence_timestamp, srt_path=default_srt_name)
   word_level_srt(words_timestamp, srt_path=word_level_srt_name)
   write_subtitles_to_file(word_segments, filename=original_srt_name)
@@ -370,14 +285,19 @@ def subtitle_maker(Audio_or_Video_File,Source_Language,max_words_per_subtitle):
   return default_srt_path,customize_srt_path,word_level_srt_path,text_path
 
 
-base_path="."
-if not os.path.exists(f"{base_path}/generated_subtitle"):
-    os.makedirs(f"{base_path}/generated_subtitle", exist_ok=True)
+
+
+
 import gradio as gr
 import click
 
+base_path="."
+if not os.path.exists(f"{base_path}/generated_subtitle"):
+    os.makedirs(f"{base_path}/generated_subtitle", exist_ok=True)
+    
 source_lang_list = ['Automatic']
-source_lang_list.extend(available_language)  # Ensure available_language is defined elsewhere
+available_language=language_dict.keys()
+source_lang_list.extend(available_language)  
 
 
 @click.command()
