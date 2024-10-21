@@ -1,3 +1,5 @@
+# Auto Subtitle Generator Using Whisper-Large-V3-Turbo-Ct2
+
 Step 1:
 ```
 git clone https://github.com/NeuralFalconYT/Whisper-Turbo-Subtitle.git
