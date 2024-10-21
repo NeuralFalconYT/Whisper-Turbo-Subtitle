@@ -304,11 +304,14 @@ source_lang_list.extend(available_language)
 @click.option("--debug", is_flag=True, default=False, help="Enable debug mode.")
 @click.option("--share", is_flag=True, default=False, help="Enable sharing of the interface.")
 def main(debug, share):
+    description = """
+    **Note**: For large video files, upload audio instead. FFmpeg video-to-audio conversion may take a long time.
+    """
     # Define Gradio inputs and outputs
     gradio_inputs = [
         gr.File(label="Upload Audio or Video File"),
         gr.Dropdown(label="Language", choices=source_lang_list, value="Automatic"),
-        gr.Number(label="Max Word Per Subtitle Segment", value=8)
+        gr.Number(label="Max Word Per Subtitle Segment [Useful for Vertical Videos]", value=8)
     ]
     
     gradio_outputs = [
@@ -319,7 +322,7 @@ def main(debug, share):
     ]
 
     # Create Gradio interface
-    demo = gr.Interface(fn=subtitle_maker, inputs=gradio_inputs, outputs=gradio_outputs, title="Auto Subtitle Generator Using Whisper-Large-V3-Turbo-Ct2")
+    demo = gr.Interface(fn=subtitle_maker, inputs=gradio_inputs, outputs=gradio_outputs, title="Auto Subtitle Generator Using Whisper-Large-V3-Turbo-Ct2",description=description)
 
     # Launch Gradio with command-line options
     demo.queue().launch(debug=debug, share=share)
