@@ -1,4 +1,5 @@
 # Auto Subtitle Generator Using Whisper-Large-V3-Turbo-Ct2
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NeuralFalconYT/Whisper-Turbo-Subtitle/blob/main/Whisper_Turbo_Subtitle.ipynb) <br>
 
 Step 1:
 ```
