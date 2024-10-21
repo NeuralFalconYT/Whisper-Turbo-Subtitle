@@ -313,7 +313,7 @@ def main(debug, share):
     
     gradio_outputs = [
         gr.File(label="Default SRT File", show_label=True),
-        gr.File(label="Customize Text File", show_label=True),
+        gr.File(label="Customize SRT File", show_label=True),
         gr.File(label="Word Level SRT File", show_label=True),
         gr.File(label="Text File", show_label=True)
     ]
