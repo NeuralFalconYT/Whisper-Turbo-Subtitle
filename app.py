@@ -319,7 +319,7 @@ def main(debug, share):
     ]
 
     # Create Gradio interface
-    demo = gr.Interface(fn=subtitle_maker, inputs=gradio_inputs, outputs=gradio_outputs, title="Whisper-Large-V3-Turbo-Ct2 Subtitle Maker")
+    demo = gr.Interface(fn=subtitle_maker, inputs=gradio_inputs, outputs=gradio_outputs, title="Auto Subtitle Generator Using Whisper-Large-V3-Turbo-Ct2")
 
     # Launch Gradio with command-line options
     demo.queue().launch(debug=debug, share=share)
