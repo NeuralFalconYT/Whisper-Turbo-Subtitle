@@ -130,6 +130,8 @@ def format_segments(segments):
     return sentence_timestamp, words_timestamp, speech_to_text
 
 def combine_word_segments(words_timestamp, max_words_per_subtitle=8, min_silence_between_words=0.5):
+    if max_words_per_subtitle<=1:
+        max_words_per_subtitle=1
     before_translate = {}
     id = 1
     text = ""
@@ -322,7 +324,6 @@ def main(debug, share):
     demo = gr.Interface(fn=subtitle_maker, inputs=gradio_inputs, outputs=gradio_outputs, title="Whisper-Large-V3-Turbo-Ct2 Subtitle Maker")
 
     # Launch Gradio with command-line options
-    demo.launch(debug=debug, share=share)
-
+    demo.queue().launch(debug=debug, share=share)
 if __name__ == "__main__":
     main()
