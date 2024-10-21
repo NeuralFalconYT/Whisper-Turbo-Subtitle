@@ -3,15 +3,11 @@ import math
 import torch
 import gc
 import time
-import subprocess
 from faster_whisper import WhisperModel
 import os
-import mimetypes
-import shutil
 import re
 import uuid
-from pydub import AudioSegment
-
+import shutil
 
 
 def get_language_name(lang_code):
@@ -42,54 +38,7 @@ def clean_file_name(file_path):
 
     return clean_file_path
 
-def get_audio_file(uploaded_file):
-    global base_path
-    # ,device
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    # Detect the file type (audio/video)
-    mime_type, _ = mimetypes.guess_type(uploaded_file)
-    # Create the folder path to store audio files
-    audio_folder = f"{base_path}/subtitle_audio"
-    os.makedirs(audio_folder, exist_ok=True)
-    # Initialize variable for the audio file path
-    audio_file_path = ""
-    if mime_type and mime_type.startswith('audio'):
-        # If it's an audio file, save it as is
-        audio_file_path = os.path.join(audio_folder, os.path.basename(uploaded_file))
-        audio_file_path=clean_file_name(audio_file_path)
-        shutil.copy(uploaded_file, audio_file_path)  # Move file to audio folder
 
-    elif mime_type and mime_type.startswith('video'):
-        # If it's a video file, extract the audio
-        audio_file_name = os.path.splitext(os.path.basename(uploaded_file))[0] + ".mp3"
-        audio_file_path = os.path.join(audio_folder, audio_file_name)
-        audio_file_path=clean_file_name(audio_file_path)
-
-        # Extract the file extension from the uploaded file
-        file_extension = os.path.splitext(uploaded_file)[1]  # Includes the dot, e.g., '.mp4'
-
-        # Generate a random UUID and create a new file name with the same extension
-        random_uuid = uuid.uuid4().hex[:6]
-        new_file_name = random_uuid + file_extension
-
-        # Set the new file path in the subtitle_audio folder
-        new_file_path = os.path.join(audio_folder, new_file_name)
-
-        # Copy the original video file to the new location with the new name
-        shutil.copy(uploaded_file, new_file_path)
-        if device=="cuda":
-          command = f"ffmpeg -hwaccel cuda -i {new_file_path} {audio_file_path} -y"
-        else:
-          command = f"ffmpeg -i {new_file_path} {audio_file_path} -y"
-
-        subprocess.run(command, shell=True)
-        if os.path.exists(new_file_path):
-          os.remove(new_file_path)
-    # Return the saved audio file path
-    audio = AudioSegment.from_file(audio_file_path)
-    # Get the duration in seconds
-    duration_seconds = len(audio) / 1000.0  # pydub measures duration in milliseconds
-    return audio_file_path,duration_seconds
 
 def format_segments(segments):
     saved_segments = list(segments)
@@ -227,10 +176,15 @@ def generate_srt_from_sentences(sentence_timestamp, srt_path="default_subtitle.s
             end_time = convert_time_to_srt_format(sentence['end'])
             srt_file.write(f"{index + 1}\n{start_time} --> {end_time}\n{sentence['text']}\n\n")
 
-
+def get_audio_file(uploaded_file):
+    global temp_folder
+    file_path = os.path.join(temp_folder, os.path.basename(uploaded_file))
+    file_path=clean_file_name(file_path)
+    shutil.copy(uploaded_file, file_path)
+    return file_path
 
 def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
-  global language_dict,base_path
+  global language_dict,base_path,subtitle_folder
   #Load model
   if torch.cuda.is_available():
       # If CUDA is available, use GPU with float16 precision
@@ -242,8 +196,7 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
       device = "cpu"
       compute_type = "int8"
   faster_whisper_model = WhisperModel("deepdml/faster-whisper-large-v3-turbo-ct2",device=device, compute_type=compute_type)
-  audio_path,audio_duration=get_audio_file(uploaded_file)
-
+  audio_path=get_audio_file(uploaded_file)
   if Source_Language=="Automatic":
       segments,d = faster_whisper_model.transcribe(audio_path, word_timestamps=True)
       lang_code=d.language
@@ -252,9 +205,10 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
     lang=language_dict[Source_Language]['lang_code']
     segments,d = faster_whisper_model.transcribe(audio_path, word_timestamps=True,language=lang)
     src_lang=Source_Language
+      
+  sentence_timestamp,words_timestamp,text=format_segments(segments)
   if os.path.exists(audio_path):
     os.remove(audio_path)
-  sentence_timestamp,words_timestamp,text=format_segments(segments)
   del faster_whisper_model
   gc.collect()
   torch.cuda.empty_cache()
@@ -263,24 +217,25 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
 
   #setup srt file names
   base_name = os.path.basename(uploaded_file).rsplit('.', 1)[0][:30]
-  save_name = f"{base_path}/generated_subtitle/{base_name}_{src_lang}.srt"
+  save_name = f"{subtitle_folder}/{base_name}_{src_lang}.srt"
   original_srt_name=clean_file_name(save_name)
   original_txt_name=original_srt_name.replace(".srt",".txt")
   word_level_srt_name=original_srt_name.replace(".srt","_word_level.srt")
-  default_srt_name=original_srt_name.replace(".srt","_default.srt")
+  customize_srt_name=original_srt_name.replace(".srt","_customize.srt")
     
-  generate_srt_from_sentences(sentence_timestamp, srt_path=default_srt_name)
+  generate_srt_from_sentences(sentence_timestamp, srt_path=original_srt_name)
   word_level_srt(words_timestamp, srt_path=word_level_srt_name)
-  write_subtitles_to_file(word_segments, filename=original_srt_name)
+  write_subtitles_to_file(word_segments, filename=customize_srt_name)
   with open(original_txt_name, 'w', encoding='utf-8') as f1:
     f1.write(text)
-  return default_srt_name,original_srt_name,word_level_srt_name,original_txt_name
+  return original_srt_name,customize_srt_name,word_level_srt_name,original_txt_name
 
 #@title Using Gradio Interface
 def subtitle_maker(Audio_or_Video_File,Source_Language,max_words_per_subtitle):
   try:
     default_srt_path,customize_srt_path,word_level_srt_path,text_path=whisper_subtitle(Audio_or_Video_File,Source_Language,max_words_per_subtitle=max_words_per_subtitle)
-  except:
+  except Exception as e:
+    print(f"Error in whisper_subtitle: {e}")
     default_srt_path,customize_srt_path,word_level_srt_path,text_path=None,None,None,None
   return default_srt_path,customize_srt_path,word_level_srt_path,text_path
 
@@ -292,8 +247,13 @@ import gradio as gr
 import click
 
 base_path="."
-if not os.path.exists(f"{base_path}/generated_subtitle"):
-    os.makedirs(f"{base_path}/generated_subtitle", exist_ok=True)
+subtitle_folder=f"{base_path}/generated_subtitle"
+temp_folder = f"{base_path}/subtitle_audio"
+
+if not os.path.exists(subtitle_folder):
+    os.makedirs(subtitle_folder, exist_ok=True)
+if not os.path.exists(temp_folder):
+    os.makedirs(temp_folder, exist_ok=True)
     
 source_lang_list = ['Automatic']
 available_language=language_dict.keys()
@@ -304,9 +264,7 @@ source_lang_list.extend(available_language)
 @click.option("--debug", is_flag=True, default=False, help="Enable debug mode.")
 @click.option("--share", is_flag=True, default=False, help="Enable sharing of the interface.")
 def main(debug, share):
-    description = """
-    **Note**: For large video files, upload audio instead. FFmpeg video-to-audio conversion may take a long time.
-    """
+    description = """**Note**: Avoid uploading large video files. Instead, upload the audio from the video for faster processing."""
     # Define Gradio inputs and outputs
     gradio_inputs = [
         gr.File(label="Upload Audio or Video File"),
