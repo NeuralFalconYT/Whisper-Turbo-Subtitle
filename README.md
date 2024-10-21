@@ -14,11 +14,11 @@ Step 4:
 ```
 python app.py 
 ```
-or
+Or,
 ```
 python app.py --debug 
 ```
-For cloud server 
+Or,
 ```
 python app.py --debug --share
 ```
