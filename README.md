@@ -1,6 +1,7 @@
 # Auto Subtitle Generator Using Whisper-Large-V3-Turbo-Ct2
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/NeuralFalconYT/Whisper-Turbo-Subtitle/blob/main/Whisper_Turbo_Subtitle.ipynb) <br>
 [![hfspace](https://img.shields.io/badge/🤗-Space%20demo-yellow)](https://huggingface.co/spaces/NeuralFalcon/Whisper-Turbo-Subtitle) <br>
+This application can run on CPU or CUDA.
 
 ### Step 1:
 ```
