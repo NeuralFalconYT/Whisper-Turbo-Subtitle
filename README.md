@@ -14,10 +14,6 @@ cd Whisper-Turbo-Subtitle
 ```
 pip install -r requirements.txt
 ```
-You may need to install [ffmpeg](https://www.ffmpeg.org/download.html) .<br>
-[How To install FFmpeg in Windows](https://www.youtube.com/watch?v=4jx2_j5Seew) <br>
-For linux:<br>
-```sudo apt install ffmpeg```
 ### Step 4:
 For local development:
 ```
