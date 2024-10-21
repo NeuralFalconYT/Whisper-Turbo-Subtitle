@@ -264,7 +264,8 @@ source_lang_list.extend(available_language)
 @click.option("--debug", is_flag=True, default=False, help="Enable debug mode.")
 @click.option("--share", is_flag=True, default=False, help="Enable sharing of the interface.")
 def main(debug, share):
-    description = """**Note**: Avoid uploading large video files. Instead, upload the audio from the video for faster processing."""
+    description = """**Note**: Avoid uploading large video files. Instead, upload the audio from the video for faster processing.
+    You can find the model at [faster-whisper-large-v3-turbo-ct2](https://huggingface.co/deepdml/faster-whisper-large-v3-turbo-ct2)"""
     # Define Gradio inputs and outputs
     gradio_inputs = [
         gr.File(label="Upload Audio or Video File"),
