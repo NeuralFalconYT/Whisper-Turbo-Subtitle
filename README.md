@@ -30,3 +30,6 @@ python app.py --debug --share
 ```
 ```--debug```: Enables debug mode, providing more detailed logs and helpful error messages.<br>
 ```--share```: Shares the application by generating a public link, allowing access from external networks.
+
+![app](https://github.com/user-attachments/assets/ce491007-d6b1-40ea-a638-b12ee0576af5)
+
