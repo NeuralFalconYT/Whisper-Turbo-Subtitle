@@ -23,7 +23,7 @@ def get_language_name(lang_code):
         # Check if the language code matches
         if details["lang_code"] == lang_code:
             return language  # Return the language name
-    return None
+    return lang_code
 
 def clean_file_name(file_path):
     # Get the base file name and extension
