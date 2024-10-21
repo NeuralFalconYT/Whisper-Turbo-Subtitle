@@ -98,6 +98,7 @@ import shutil
 import re
 import uuid
 from pydub import AudioSegment
+import torch
 
 
 def get_language_name(lang_code):
@@ -323,7 +324,16 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
   word_level_srt_name=original_srt_name.replace(".srt","_word_level.srt")
   default_srt_name=original_srt_name.replace(".srt","_default.srt")
   #Load model
-  faster_whisper_model = WhisperModel("deepdml/faster-whisper-large-v3-turbo-ct2")
+  if torch.cuda.is_available():
+      # If CUDA is available, use GPU with float16 precision
+      device = "cuda"
+      compute_type = "float16"
+      # compute_type="int8_float16"
+  else:
+      # If CUDA is not available, use CPU with int8 precision
+      device = "cpu"
+      compute_type = "int8"
+  faster_whisper_model = WhisperModel("deepdml/faster-whisper-large-v3-turbo-ct2",device=device, compute_type=compute_type)
   audio_path,audio_duration=get_audio_file(uploaded_file)
 
   if Source_Language=="Automatic":
