@@ -13,6 +13,7 @@ Step 3:
 ```
 pip install -r requirements.txt
 ```
+You may need to install [ffmpeg](https://www.ffmpeg.org/download.html) <br>
 Step 4:
 ```
 python app.py 
