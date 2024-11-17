@@ -1,5 +1,5 @@
 faster-whisper==1.0.3
 torch>=2.1.1 
-gradio
-click
+gradio>=5.6.0
+click>=8.1.7
 ctranslate2==4.4.0
