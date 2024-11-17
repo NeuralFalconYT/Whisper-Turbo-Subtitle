@@ -137,6 +137,78 @@ def combine_word_segments(words_timestamp, max_words_per_subtitle=8, min_silence
 
     return before_translate
 
+def custom_word_segments(words_timestamp, min_silence_between_words=0.3, max_characters_per_subtitle=17):
+    before_translate = []
+    id = 1
+    text = ""
+    start = None
+    end = None
+    last_end_time = None
+
+    i = 0
+    while i < len(words_timestamp):
+        word = words_timestamp[i]['word']
+        word_start = words_timestamp[i]['start']
+        word_end = words_timestamp[i]['end']
+
+        # Look ahead to check if the next word (i+1) starts with a hyphen
+        if i + 1 < len(words_timestamp) and words_timestamp[i + 1]['word'].startswith("-"):
+            # Combine the current word and the next word (i, i+1) if next word starts with a hyphen
+            combined_text = word + words_timestamp[i + 1]['word'][:]  # Skip the hyphen and combine
+            combined_start_time = word_start
+            combined_end_time = words_timestamp[i + 1]['end']
+
+            i += 1  # Skip the next word (i+1) since it has been combined
+
+            # Look ahead for the next non-hyphenated word, check further if needed (i+2, i+3, etc.)
+            while i + 1 < len(words_timestamp) and words_timestamp[i + 1]['word'].startswith("-"):
+                combined_text += words_timestamp[i + 1]['word'][:]  # Add word excluding hyphen
+                combined_end_time = words_timestamp[i + 1]['end']
+                i += 1  # Skip the next hyphenated word
+
+        else:
+            # No hyphen at the next word, just take the current word
+            combined_text = word
+            combined_start_time = word_start
+            combined_end_time = word_end
+
+        # Check if the combined text exceeds the maximum character limit
+        if len(text) + len(combined_text) > max_characters_per_subtitle:
+            # If accumulated text is non-empty, store it as a subtitle
+            if text:
+                before_translate.append({
+                    "word": text.strip(),
+                    "start": start,
+                    "end": end
+                })
+                id += 1
+            # Start a new subtitle with the combined text
+            text = combined_text
+            start = combined_start_time
+        else:
+            # Accumulate text
+            if not text:
+                start = combined_start_time
+            text += " " + combined_text
+
+        # Update the end timestamp
+        end = combined_end_time
+        last_end_time = end
+
+        # Move to the next word
+        i += 1
+
+    # Add the final subtitle segment if text is not empty
+    if text:
+        before_translate.append({
+            "word": text.strip(),
+            "start": start,
+            "end": end
+        })
+
+    return before_translate
+
+
 
 def convert_time_to_srt_format(seconds):
     """ Convert seconds to SRT time format (HH:MM:SS,ms) """
@@ -162,14 +234,19 @@ def write_subtitles_to_file(subtitles, filename="subtitles.srt"):
             # Write the text and speaker information
             f.write(f"{entry['text']}\n\n")
 
-def word_level_srt(words_timestamp, srt_path="world_level_subtitle.srt"):
+
+def word_level_srt(words_timestamp, srt_path="world_level_subtitle.srt",shorts=False):
+    punctuation_pattern = re.compile(r'[.,!?;:"\–—_~^+*|]')
     with open(srt_path, 'w', encoding='utf-8') as srt_file:
         for i, word_info in enumerate(words_timestamp, start=1):
             start_time = convert_time_to_srt_format(word_info['start'])
             end_time = convert_time_to_srt_format(word_info['end'])
             word=word_info['word']
-            word = re.sub(r'[.,!?]+$', '', word)
+            word =re.sub(punctuation_pattern, '', word)
+            if shorts==False:
+              word=word.replace("-","")
             srt_file.write(f"{i}\n{start_time} --> {end_time}\n{word}\n\n")
+
 
 def generate_srt_from_sentences(sentence_timestamp, srt_path="default_subtitle.srt"):
     with open(srt_path, 'w', encoding='utf-8') as srt_file:
@@ -214,9 +291,9 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
   del faster_whisper_model
   gc.collect()
   torch.cuda.empty_cache()
-
+  
   word_segments=combine_word_segments(words_timestamp, max_words_per_subtitle=max_words_per_subtitle, min_silence_between_words=0.5)
-
+  shorts_segments=custom_word_segments(words_timestamp, min_silence_between_words=0.3, max_characters_per_subtitle=17)
   #setup srt file names
   base_name = os.path.basename(uploaded_file).rsplit('.', 1)[0][:30]
   save_name = f"{subtitle_folder}/{base_name}_{src_lang}.srt"
@@ -224,22 +301,24 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
   original_txt_name=original_srt_name.replace(".srt",".txt")
   word_level_srt_name=original_srt_name.replace(".srt","_word_level.srt")
   customize_srt_name=original_srt_name.replace(".srt","_customize.srt")
+  shorts_srt_name=original_srt_name.replace(".srt","_shorts.srt")
     
   generate_srt_from_sentences(sentence_timestamp, srt_path=original_srt_name)
   word_level_srt(words_timestamp, srt_path=word_level_srt_name)
+  word_level_srt(shorts_segments, srt_path=shorts_srt_name,shorts=True)
   write_subtitles_to_file(word_segments, filename=customize_srt_name)
   with open(original_txt_name, 'w', encoding='utf-8') as f1:
     f1.write(text)
-  return original_srt_name,customize_srt_name,word_level_srt_name,original_txt_name
+  return original_srt_name,customize_srt_name,word_level_srt_name,shorts_srt_name,original_txt_name
 
 #@title Using Gradio Interface
 def subtitle_maker(Audio_or_Video_File,Source_Language,max_words_per_subtitle):
   try:
-    default_srt_path,customize_srt_path,word_level_srt_path,text_path=whisper_subtitle(Audio_or_Video_File,Source_Language,max_words_per_subtitle=max_words_per_subtitle)
+    default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path=whisper_subtitle(Audio_or_Video_File,Source_Language,max_words_per_subtitle=max_words_per_subtitle)
   except Exception as e:
     print(f"Error in whisper_subtitle: {e}")
-    default_srt_path,customize_srt_path,word_level_srt_path,text_path=None,None,None,None
-  return default_srt_path,customize_srt_path,word_level_srt_path,text_path
+    default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path=None,None,None,None,None
+  return default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path
 
 
 
@@ -262,6 +341,7 @@ available_language=language_dict.keys()
 source_lang_list.extend(available_language)  
 
 
+
 @click.command()
 @click.option("--debug", is_flag=True, default=False, help="Enable debug mode.")
 @click.option("--share", is_flag=True, default=False, help="Enable sharing of the interface.")
@@ -279,6 +359,7 @@ def main(debug, share):
         gr.File(label="Default SRT File", show_label=True),
         gr.File(label="Customize SRT File", show_label=True),
         gr.File(label="Word Level SRT File", show_label=True),
+        gr.File(label="SRT File For Shorts", show_label=True),
         gr.File(label="Text File", show_label=True)
     ]
 
