@@ -167,7 +167,9 @@ def word_level_srt(words_timestamp, srt_path="world_level_subtitle.srt"):
         for i, word_info in enumerate(words_timestamp, start=1):
             start_time = convert_time_to_srt_format(word_info['start'])
             end_time = convert_time_to_srt_format(word_info['end'])
-            srt_file.write(f"{i}\n{start_time} --> {end_time}\n{word_info['word']}\n\n")
+            word=word_info['word']
+            word = re.sub(r'[.,!?]+$', '', word)
+            srt_file.write(f"{i}\n{start_time} --> {end_time}\n{word}\n\n")
 
 def generate_srt_from_sentences(sentence_timestamp, srt_path="default_subtitle.srt"):
     with open(srt_path, 'w', encoding='utf-8') as srt_file:
