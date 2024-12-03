@@ -243,6 +243,8 @@ def word_level_srt(words_timestamp, srt_path="world_level_subtitle.srt",shorts=F
             end_time = convert_time_to_srt_format(word_info['end'])
             word=word_info['word']
             word =re.sub(punctuation_pattern, '', word)
+            if word.strip() == 'i':
+                word = "I"
             if shorts==False:
               word=word.replace("-","")
             srt_file.write(f"{i}\n{start_time} --> {end_time}\n{word}\n\n")
