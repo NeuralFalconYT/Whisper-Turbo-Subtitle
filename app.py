@@ -313,14 +313,59 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
     f1.write(text)
   return original_srt_name,customize_srt_name,word_level_srt_name,shorts_srt_name,original_txt_name
 
+
+from utils import language_dict
+import pysrt
+from deep_translator import GoogleTranslator
+
+def translate_text(text, Source_Language, Destination_Language):
+    """
+    Translates the given text using GoogleTranslator.
+    """
+    source_language = language_dict[Source_Language]['lang_code']
+    target_language = language_dict[Destination_Language]['lang_code']
+    
+    # Adjust for specific language codes
+    if Destination_Language == "Chinese":
+        target_language = 'zh-CN'
+    
+    translator = GoogleTranslator(source=source_language, target=target_language)
+    translation = translator.translate(text.strip())
+    return str(translation)
+
+def translate_subtitle(subtitles, Source_Language, Destination_Language):
+    """
+    Translates subtitles while preserving their timing.
+    """
+    global language_dict
+    store_text = ""
+    for subtitle in subtitles:
+        # Translate the text of each subtitle
+        text_translated = translate_text(subtitle.text, Source_Language, Destination_Language)
+        subtitle.text = text_translated  # Update the subtitle text
+        store_text += text_translated.strip() + " "  # Use translated text for storing
+    
+    return subtitles, store_text
+
+
 #@title Using Gradio Interface
-def subtitle_maker(Audio_or_Video_File,Source_Language,max_words_per_subtitle):
+def subtitle_maker(Audio_or_Video_File,Source_Language,Destination_Language,max_words_per_subtitle):
   try:
     default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path=whisper_subtitle(Audio_or_Video_File,Source_Language,max_words_per_subtitle=max_words_per_subtitle)
   except Exception as e:
     print(f"Error in whisper_subtitle: {e}")
     default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path=None,None,None,None,None
-  return default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path
+  global subtitle_folder
+  if Source_Language!=Destination_Language:
+    subtitles = pysrt.open(default_srt_path, encoding='utf-8')
+    translated_subtitles, _ = translate_subtitle(subtitles, Source_Language, Destination_Language)
+    tra_srt_name=os.path.basename(default_srt_path).replace(".srt",f"_{Destination_Language}.srt")
+    output_srt_path=f"{subtitle_folder}/{tra_srt_name}"
+    translated_subtitles.save(output_srt_path, encoding='utf-8')
+  else:
+    output_srt_path=None 
+
+  return default_srt_path,output_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path
 
 
 
@@ -353,12 +398,15 @@ def main(debug, share):
     # Define Gradio inputs and outputs
     gradio_inputs = [
         gr.File(label="Upload Audio or Video File"),
-        gr.Dropdown(label="Language", choices=source_lang_list, value="Automatic"),
+        gr.Dropdown(label="Source Language", choices=source_lang_list, value="Automatic"),
+        gr.Dropdown(label="Translate Into", choices=source_lang_list, value="English"),
+
         gr.Number(label="Max Word Per Subtitle Segment [Useful for Vertical Videos]", value=8)
     ]
     
     gradio_outputs = [
         gr.File(label="Default SRT File", show_label=True),
+        gr.File(label="Translated SRT File", show_label=True),
         gr.File(label="Customize SRT File", show_label=True),
         gr.File(label="Word Level SRT File", show_label=True),
         gr.File(label="SRT File For Shorts", show_label=True),
