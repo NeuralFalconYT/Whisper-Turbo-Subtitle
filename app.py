@@ -383,7 +383,8 @@ if not os.path.exists(subtitle_folder):
 if not os.path.exists(temp_folder):
     os.makedirs(temp_folder, exist_ok=True)
     
-source_lang_list = ['Automatic']
+# source_lang_list = ['Automatic']
+source_lang_list = []
 available_language=language_dict.keys()
 source_lang_list.extend(available_language)  
 
@@ -398,7 +399,7 @@ def main(debug, share):
     # Define Gradio inputs and outputs
     gradio_inputs = [
         gr.File(label="Upload Audio or Video File"),
-        gr.Dropdown(label="Source Language", choices=source_lang_list, value="Automatic"),
+        gr.Dropdown(label="Source Language", choices=source_lang_list, value="English"),
         gr.Dropdown(label="Translate Into", choices=source_lang_list, value="English"),
 
         gr.Number(label="Max Word Per Subtitle Segment [Useful for Vertical Videos]", value=8)
