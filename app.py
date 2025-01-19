@@ -311,7 +311,7 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
   write_subtitles_to_file(word_segments, filename=customize_srt_name)
   with open(original_txt_name, 'w', encoding='utf-8') as f1:
     f1.write(text)
-  return original_srt_name,customize_srt_name,word_level_srt_name,shorts_srt_name,original_txt_name
+  return original_srt_name,customize_srt_name,word_level_srt_name,shorts_srt_name,original_txt_name,src_lang
 
 
 from utils import language_dict
@@ -351,14 +351,15 @@ def translate_subtitle(subtitles, Source_Language, Destination_Language):
 #@title Using Gradio Interface
 def subtitle_maker(Audio_or_Video_File,Source_Language,Destination_Language,max_words_per_subtitle):
   try:
-    default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path=whisper_subtitle(Audio_or_Video_File,Source_Language,max_words_per_subtitle=max_words_per_subtitle)
+    default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path,src_lang=whisper_subtitle(Audio_or_Video_File,Source_Language,max_words_per_subtitle=max_words_per_subtitle)
   except Exception as e:
     print(f"Error in whisper_subtitle: {e}")
-    default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path=None,None,None,None,None
+    default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path,src_lang=None,None,None,None,None,None
   global subtitle_folder
-  if Source_Language!=Destination_Language:
+  print(src_lang)
+  if src_lang!=Destination_Language:
     subtitles = pysrt.open(default_srt_path, encoding='utf-8')
-    translated_subtitles, _ = translate_subtitle(subtitles, Source_Language, Destination_Language)
+    translated_subtitles, _ = translate_subtitle(subtitles, src_lang, Destination_Language)
     tra_srt_name=os.path.basename(default_srt_path).replace(".srt",f"_{Destination_Language}.srt")
     output_srt_path=f"{subtitle_folder}/{tra_srt_name}"
     translated_subtitles.save(output_srt_path, encoding='utf-8')
@@ -383,13 +384,13 @@ if not os.path.exists(subtitle_folder):
 if not os.path.exists(temp_folder):
     os.makedirs(temp_folder, exist_ok=True)
     
-# source_lang_list = ['Automatic']
-source_lang_list = []
+source_lang_list = ['Automatic']
+
 available_language=language_dict.keys()
 source_lang_list.extend(available_language)  
 
-
-
+target_lang_list = []
+target_lang_list.extend(available_language)  
 @click.command()
 @click.option("--debug", is_flag=True, default=False, help="Enable debug mode.")
 @click.option("--share", is_flag=True, default=False, help="Enable sharing of the interface.")
@@ -400,7 +401,7 @@ def main(debug, share):
     gradio_inputs = [
         gr.File(label="Upload Audio or Video File"),
         gr.Dropdown(label="Source Language", choices=source_lang_list, value="English"),
-        gr.Dropdown(label="Translate Into", choices=source_lang_list, value="English"),
+        gr.Dropdown(label="Translate Into", choices=target_lang_list, value="English"),
 
         gr.Number(label="Max Word Per Subtitle Segment [Useful for Vertical Videos]", value=8)
     ]
