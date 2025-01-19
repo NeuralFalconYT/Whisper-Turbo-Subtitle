@@ -356,7 +356,7 @@ def subtitle_maker(Audio_or_Video_File,Source_Language,Destination_Language,max_
     print(f"Error in whisper_subtitle: {e}")
     default_srt_path,customize_srt_path,word_level_srt_path,shorts_srt_name,text_path,src_lang=None,None,None,None,None,None
   global subtitle_folder
-  print(src_lang)
+  # print(src_lang)
   if src_lang!=Destination_Language:
     subtitles = pysrt.open(default_srt_path, encoding='utf-8')
     translated_subtitles, _ = translate_subtitle(subtitles, src_lang, Destination_Language)
