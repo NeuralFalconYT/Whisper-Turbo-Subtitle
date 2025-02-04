@@ -276,6 +276,8 @@ def whisper_subtitle(uploaded_file,Source_Language,max_words_per_subtitle=8):
       # If CUDA is not available, use CPU with int8 precision
       device = "cpu"
       compute_type = "int8"
+#   device = "cpu"
+#   compute_type = "int8"      
   faster_whisper_model = WhisperModel("deepdml/faster-whisper-large-v3-turbo-ct2",device=device, compute_type=compute_type)
   audio_path=get_audio_file(uploaded_file)
   if Source_Language=="Automatic":
