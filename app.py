@@ -384,7 +384,7 @@ if not os.path.exists(subtitle_folder):
 if not os.path.exists(temp_folder):
     os.makedirs(temp_folder, exist_ok=True)
     
-source_lang_list = ['Automatic',"English","Hindi"]
+source_lang_list = ['Automatic']
 
 available_language=language_dict.keys()
 source_lang_list.extend(available_language)  
